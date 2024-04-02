@@ -1,6 +1,6 @@
 %% ---------------------- WORKSHOP 9 Solutions -----------------------%%
-%%%---------------------- Anjali March 2024 ------------------------%%
-%%%------------------------- Question 1 ---------------------------%%
+%%%---------------------- Modified from Dr Anjali March 2024 ---------%%
+%%%------------------------- Question 1 ------------------------------%%
 
 %% Fz_data :
 %    Amplitude (y-axis)
@@ -12,10 +12,11 @@ close all
 %% INITIALISE VARIABLES
 
 %%---------- Set subject and group labels for saving files later
-group = 'Controls';
+% group = 'Controls';
+group = 'Patients';
 
 %----------- Set path
-path = ('/Users/anjalibhat/Documents/MATLAB/5PASNCBS_2024/Week_9/MMN_data');
+path = ('/home/minseok/MATLAB/MATLAB/Week9/MMN_data');
 cd (path) % cd = 'change directory'
 files = dir(fullfile(path, group));
 N = (length(files)) - 2; %number of subjects in group, accounting for ghost files
@@ -25,8 +26,10 @@ for num = 1:N
 
 %----------- Load data
 
-load(fullfile('MMN_data', group, strcat('Fz_data_control', int2str(num), '.mat')));
-sub = strcat('control', int2str(num));
+% load(fullfile(path, group, strcat('Fz_data_control', int2str(num), '.mat')));
+% sub = strcat('control', int2str(num));
+load(fullfile(path, group, strcat('Fz_data_patient', int2str(num), '.mat')));
+sub = strcat('patient', int2str(num));
 
 %----------- Inspect data
 len = length(Fz_data(:,1));
@@ -111,26 +114,26 @@ end
 %%---------- Then do the same for deviants
 latency = ([-50:250]);
 
-% for i = 1: length(standards)
-% plot(latency, standards(i,:)) 
-% xlim = ([-50 250]);
-% title('Standards')
-% xlabel('Latency(ms)')
-% ylabel('Amplitude (uv)')
-% hold on
-% end
-% hold off
-% 
-% 
-% for i = 1: length(deviants(:,1))
-% plot(latency, deviants(i,:)) 
-% xlim = ([-50 250]);
-% title('Deviants')
-% xlabel('Latency(ms)')
-% ylabel('Amplitude (uv)')
-% hold on
-% end
-% hold off
+for i = 1: length(standards)
+plot(latency, standards(i,:)) 
+xlim = ([-50 250]);
+title('Standards')
+xlabel('Latency(ms)')
+ylabel('Amplitude (uv)')
+hold on
+end
+hold off
+
+
+for i = 1: length(deviants(:,1))
+plot(latency, deviants(i,:)) 
+xlim = ([-50 250]);
+title('Deviants')
+xlabel('Latency(ms)')
+ylabel('Amplitude (uv)')
+hold on
+end
+hold off
 
 %%----------  Average the waves
 
@@ -154,31 +157,36 @@ hold off
 %%---------- Use the 'fullfile' and 'strcat' functions to save the epoched data (standards, deviants and all) as .mat files
 
 % fullfile to specify where to put stuff
-save(fullfile('Epoched_data', group, strcat('Epoched_', sub, '.mat')), 'Epoched_data')
-save(fullfile('Epoched_data', group, strcat('standards_', sub, '.mat')), 'standards')
-save(fullfile('Epoched_data', group, strcat('deviants_', sub, '.mat')), 'deviants')
+% save(Epoched_data)
+mkdir(fullfile(path, 'Epoched_data', group))
+save(fullfile(path, 'Epoched_data', group, strcat('Epoched_', sub, '.mat')), 'Epoched_data')
+save(fullfile(path, 'Epoched_data', group, strcat('standards_', sub, '.mat')), 'standards')
+save(fullfile(path, 'Epoched_data', group, strcat('deviants_', sub, '.mat')), 'deviants')
 
 %% COMPUTE MMN
 %%--------- Compute the MMN 
 MMN = avg_standard - avg_deviant;
 plot(latency, MMN); 
-save(fullfile('MMN', group, strcat('MMN_', sub, '.mat')), 'MMN')
+mkdir(fullfile(path, 'MMN_', group))
+save(fullfile(path, 'MMN_', group, strcat('MMN_', sub, '.mat')), 'MMN')
 
 %%---------------- Add the averaged waves to a compilation data frame
 if group == 'Controls'
     standards_all_controls(num,:) = avg_standard;
     deviants_all_controls(num,:) = avg_deviant;
     MMN_all_controls(num,:) = MMN;
-    save(fullfile('Epoched_data/Compiled', strcat('standards_all_controls.mat')), 'standards_all_controls')
-    save(fullfile('Epoched_data/Compiled', strcat('deviants_all_controls.mat')), 'deviants_all_controls')
-    save(fullfile('Epoched_data/Compiled', strcat('MMN_all_controls.mat')), 'MMN_all_controls')
+    % mkdir(fullfile(path, 'Epoched_data/Compiled'))
+    save(fullfile(path, 'Epoched_data/Compiled', strcat('standards_all_controls.mat')), 'standards_all_controls')
+    save(fullfile(path, 'Epoched_data/Compiled', strcat('deviants_all_controls.mat')), 'deviants_all_controls')
+    save(fullfile(path, 'Epoched_data/Compiled', strcat('MMN_all_controls.mat')), 'MMN_all_controls')
 elseif group == 'Patients'
     standards_all_patients(num,:) = avg_standard;
     deviants_all_patients(num,:) = avg_deviant;
     MMN_all_patients(num,:) = MMN;
-    save(fullfile('Epoched_data/Compiled', strcat('standards_all_patients.mat')), 'standards_all_patients')
-    save(fullfile('Epoched_data/Compiled', strcat('deviants_all_patients.mat')), 'deviants_all_patients')
-    save(fullfile('Epoched_data/Compiled', strcat('MMN_all_patients.mat')), 'MMN_all_patients')
+    % mkdir(fullfile(path, 'Epoched_data/Compiled'))
+    save(fullfile(path, 'Epoched_data/Compiled', strcat('standards_all_patients.mat')), 'standards_all_patients')
+    save(fullfile(path, 'Epoched_data/Compiled', strcat('deviants_all_patients.mat')), 'deviants_all_patients')
+    save(fullfile(path, 'Epoched_data/Compiled', strcat('MMN_all_patients.mat')), 'MMN_all_patients')
 end
 
 %% CLEAR EVERYTHING NOW - SO THAT THE WHOLE SCRIPT CAN BE LOOPED
